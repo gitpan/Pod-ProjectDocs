@@ -1,0 +1,9 @@
+Revision history for Perl extension Pod::ProjectDocs.
+
+0.02  Sat Jun 18 18:00:00 2005
+    - CPAN release version;
+
+0.01  Thu Jun 16 16:52:20 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A Pod::ProjectDocs
+

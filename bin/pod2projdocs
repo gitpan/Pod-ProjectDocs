@@ -1,0 +1,79 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}' if 0;
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Pod::ProjectDocs;
+
+my($help, $out, $lib, $title, $desc, $charset, $index, $verbose);
+
+my %opt = (
+	'help|?'		=> \$help,
+	'out|o=s'		=> \$out,
+	'lib|l=s'		=> \$lib,
+	'title|t=s'		=> \$title,
+	'desc|d=s'		=> \$desc,
+	'charset|c=s'	=> \$charset,
+	'index!'		=> \$index,
+	'verbose|v'		=> \$verbose,
+);
+
+GetOptions(%opt);
+
+pod2usage(1) if($help);
+
+my $p = Pod::ProjectDocs->new(
+	outroot	=> $out,
+	libroot	=> $lib,
+	title	=> $title,
+	desc	=> $desc,
+	charset	=> $charset,
+	index	=> $index,
+	verbose	=> $verbose,
+);
+$p->gen;
+
+=head1 NAME
+
+pod2projdocs - ganerates CPAN like project documents from pod.
+
+=head1 SYNOPSIS
+
+pod2projdocs [options]
+
+ Options:
+    -help        display this help and exists
+    -out         directory path that you want to generate documents into
+    -lib         your project's library-root-directory path
+    -title       your project's title
+    -desc        your project's description
+    -charset     this is used in meta tag in html. default 'UTF-8'
+    -noindex     don't create index on each pod pages.
+    -verbose     show messages.
+
+ you can set each options with their first alphabet.
+ for example, you can write -o instead of -out.
+
+=head1 DESCRIPTION
+
+generates CPAN like project documents from pod.
+
+=head1 SEE ALSO
+
+L<Pod::ProjectDocs>
+
+=head1 AUTHOR
+
+Lyo Kato E<lt>E<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 Lyo Kato. All rights reserved.
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut
+

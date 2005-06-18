@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/pod2projdocs
+t/00_compile.t
+lib/Pod/ProjectDocs.pm
+lib/Pod/ProjectDocs/File.pm
+lib/Pod/ProjectDocs/Doc.pm
+lib/Pod/ProjectDocs/CSS.pm
+lib/Pod/ProjectDocs/IndexPage.pm
+lib/Pod/ProjectDocs/ArrowImage.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)
