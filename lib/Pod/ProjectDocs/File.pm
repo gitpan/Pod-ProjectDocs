@@ -1,13 +1,9 @@
 package Pod::ProjectDocs::File;
 use strict;
 use base qw/Class::Accessor Class::Data::Inheritable/;
-use FindBin;
 use IO::File;
 use File::Basename;
-use File::Spec::Functions qw/
-	file_name_is_absolute catfile catdir
-	curdir rel2abs abs2rel splitdir
-/;
+use File::Spec;
 
 __PACKAGE__->mk_classdata($_) for qw/default_name data is_bin/;
 __PACKAGE__->mk_accessors(qw/dir file path outroot/);
@@ -25,21 +21,21 @@ sub _init {
 	my $self = shift;
 	my %args = @_;
 
-	my $out  = $args{outroot} || curdir;
+	my $out  = $args{outroot} || File::Spec->curdir;
 	my $file = $args{file}    || $self->default_name;
 
 	$self->outroot($out);
 	$self->file($file);
 	$self->dir( (exists $args{dir} && $args{dir})
-		? catdir($out, $args{dir}) : $out);
+		? File::Spec->catdir($out, $args{dir}) : $out);
 	$self->_set_path;
 }
 
 sub _set_path {
 	my $self = shift;
-	my $path = catfile $self->dir, $self->file;
-	unless( file_name_is_absolute $path ){
-		$path = rel2abs $path, $FindBin::Bin;
+	my $path = File::Spec->catfile($self->dir, $self->file);
+	unless(File::Spec->file_name_is_absolute($path)){
+		$path = File::Spec->rel2abs($path, File::Spec->curdir);
 	}
 	$self->path($path);
 }

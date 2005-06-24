@@ -3,7 +3,6 @@ use strict;
 use base qw/Pod::ProjectDocs::File/;
 use Pod::Xhtml;
 use File::Basename;
-use File::Spec::Functions qw/abs2rel curdir catfile catdir splitdir/;
 
 __PACKAGE__->mk_accessors(qw/
 	rel_path libroot origin name title author has_document
@@ -31,11 +30,11 @@ sub _init {
 		$self->_croak("Set args [origin libroot outroot].");
 	}
 	my($name, $directory) = fileparse $self->origin, qr/\.(?:pm|pod)/;
-	$directory = abs2rel $directory, $self->libroot;
-	$directory ||= curdir;
+	$directory = File::Spec->abs2rel($directory, $self->libroot);
+	$directory ||= File::Spec->curdir;
 	$self->_check_dir($directory);
-	my $rel_path = catdir $directory, $name;
-	$self->name( join "-", splitdir $rel_path );
+	my $rel_path = File::Spec->catdir($directory, $name);
+	$self->name( join "-", File::Spec->splitdir($rel_path) );
 	$self->rel_path($rel_path.".html");
 	$self->SUPER::_init(
 		outroot => $self->outroot,
@@ -47,10 +46,10 @@ sub _init {
 sub _check_dir {
 	my $self = shift;
 	my $dir  = shift;
-	my @dirs = splitdir $dir;
+	my @dirs = File::Spec->splitdir($dir);
 	my $path = $self->outroot;
 	foreach(@dirs){
-		$path = catdir $path, $_;
+		$path = File::Spec->catdir($path, $_);
 		unless(-e $path && -d $path){
 			mkdir($path, 0755)
 				or $self->_croak("Can't make directory [$path].");
@@ -111,7 +110,7 @@ sub _get_rel_path {
 	my $self = shift;
 	my $path = shift;
 	my($name, $directory) = fileparse $self->path, qr/\.html/;
-	return abs2rel $path, $directory;
+	return File::Spec->abs2rel($path, $directory);
 }
 
 sub _save_data {
@@ -138,7 +137,7 @@ sub _save_data {
 		title	=> $args{title},
 		desc	=> $args{desc},
 		name	=> $args{name},
-		outroot => catfile($self->outroot,'index.html'),
+		outroot => File::Spec->catfile($self->outroot,'index.html'),
 	}, \$text)
 		or $self->_croak($tt->error);
 	return $text;

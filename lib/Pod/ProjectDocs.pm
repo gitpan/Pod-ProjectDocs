@@ -3,13 +3,14 @@ use strict;
 use base qw/Class::Accessor/;
 
 use vars qw/$VERSION/;
-$VERSION = '0.02';
+$VERSION = "0.05";
 
 use Pod::ProjectDocs::IndexPage;
 use Pod::ProjectDocs::Doc;
 use Pod::ProjectDocs::CSS;
 use Pod::ProjectDocs::ArrowImage;
 use File::Find ();
+use File::Spec;
 
 use constant DEFAULT_TITLE   => "MyProject's Perl Modules";
 use constant DEFAULT_DESC	 => "manuals and modules";
@@ -30,8 +31,17 @@ sub _init {
 	my($self, %args) = @_;
 	$self->title($args{title} || DEFAULT_TITLE );
 	$self->desc($args{desc} || DEFAULT_DESC);
-	$self->outroot($args{outroot} || ".");
-	$self->libroot($args{libroot} || ".");
+
+	$args{outroot} ||= File::Spec->curdir;
+	$args{outroot} = File::Spec->rel2abs($args{outroot}, File::Spec->curdir)
+		unless File::Spec->file_name_is_absolute($args{outroot});	
+	$self->outroot($args{outroot});
+
+	$args{libroot} ||= File::Spec->curdir;
+	$args{libroot} = File::Spec->rel2abs($args{libroot}, File::Spec->curdir)
+		unless File::Spec->file_name_is_absolute($args{outroot});
+	$self->libroot($args{libroot});
+
 	$self->charset($args{charset} || DEFAULT_CHARSET);
 	$self->verbose($args{verbose});
 	$self->index($args{index});

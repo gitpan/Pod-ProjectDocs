@@ -2,7 +2,6 @@ package Pod::ProjectDocs::CSS;
 use strict;
 use base qw/Pod::ProjectDocs::File/;
 use File::Basename;
-use File::Spec::Functions qw/abs2rel/;
 
 __PACKAGE__->default_name('podstyle.css');
 __PACKAGE__->data( do{ local $/; <DATA> } );
@@ -11,7 +10,7 @@ sub tag {
 	my $self = shift;
 	my $file = shift;
 	my($name, $path) = fileparse $file->path, qw/\.html/;
-	my $rel_path = abs2rel $self->path, $path;
+	my $rel_path = File::Spec->abs2rel($self->path, $path);
 	return sprintf qq|<link rel="stylesheet" type="text/css" href="%s" />|, $rel_path;
 }
 
