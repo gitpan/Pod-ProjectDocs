@@ -3,7 +3,7 @@ use strict;
 use base qw/Class::Accessor/;
 
 use vars qw/$VERSION/;
-$VERSION = "0.05";
+$VERSION = "0.06";
 
 use Pod::ProjectDocs::IndexPage;
 use Pod::ProjectDocs::Doc;
@@ -38,7 +38,8 @@ sub _init {
 	$self->outroot($args{outroot});
 
 	$args{libroot} ||= File::Spec->curdir;
-	$args{libroot} = File::Spec->rel2abs($args{libroot}, File::Spec->curdir)
+        $args{libroot} = [ $args{libroot} ] unless ref $args{libroot};
+	$args{libroot} = [ map File::Spec->rel2abs($_, File::Spec->curdir), @{$args{libroot}} ]
 		unless File::Spec->file_name_is_absolute($args{outroot});
 	$self->libroot($args{libroot});
 
@@ -51,7 +52,7 @@ sub _init {
 	$self->_message("...");
 	$self->_message("...");
 	$self->_message("output root:  [".$self->outroot."]");
-	$self->_message("library root: [".$self->libroot."]");
+	$self->_message("library root: [". join(", ", @{$self->libroot}) ."]");
 	$self->_message("...");
 }
 
@@ -83,36 +84,36 @@ sub gen {
 
 	$self->_message("...");
 	$self->_message("...");
-	$self->_message("searching your perl-modules in your library directory [".$self->libroot."]...");
+	$self->_message("searching your perl-modules in your library directory [". join(", ", @{$self->libroot}) ."]...");
 	$self->_message("...");
 
 	my @modules = ();
-	foreach my $file ( sort $self->_find_packages('pm') ) {
+	foreach my $file ( sort { $a->{path} cmp $b->{path} } $self->_find_packages('pm') ) {
 
-		$self->_message("found $file.");
+		$self->_message("found $file->{path}.");
 
 		my $doc = Pod::ProjectDocs::Doc->new(
-			origin 	=> $file,
+			origin 	=> $file->{path},
 			outroot	=> $self->outroot,
-			libroot => $self->libroot,
+			libroot => $file->{dir},
 		);
 		push(@modules, $doc);
 	}
 
 	$self->_message("...");
 	$self->_message("...");
-	$self->_message("searching your pod-manuals in your library directory [".$self->libroot."]...");
+	$self->_message("searching your pod-manuals in your library directory [". join(", ", @{$self->libroot}) ."]...");
 	$self->_message("...");
 
 	my @mans = ();
-	foreach my $file ( sort $self->_find_packages('pod') ){
+	foreach my $file ( sort { $a->{path} cmp $b->{path} } $self->_find_packages('pod') ){
 
-		$self->_message("found $file.");
+		$self->_message("found $file->{path}.");
 
 		my $doc = Pod::ProjectDocs::Doc->new(
-			origin	=> $file,
+			origin	=> $file->{path},
 			outroot => $self->outroot,
-			libroot => $self->libroot,
+			libroot => $file->{dir},
 		);
 		push(@mans, $doc);
 	}
@@ -199,15 +200,19 @@ sub _find_packages {
 	my $self = shift;
 	my $suffix = shift;
 	my $search = $self->libroot;
-	$self->_croak("$search isn't detected or it's not a directory.")
-		unless( -e $search && -d $search );
+        for my $dir (@$search) {
+            $self->_croak("$dir isn't detected or it's not a directory.")
+		unless( -e $dir && -d _ );
+        }
 	my @files  = ();
-	my $wanted = sub {
+        for my $dir (@$search) {
+            my $wanted = sub {
 		return unless $File::Find::name =~ /\.$suffix$/;
 		(my $path = $File::Find::name ) =~ s#^\\.##;
-		push @files, $path;
-	};
-	File::Find::find( { no_chdir => 1, wanted => $wanted }, $search );
+		push @files, { path => $path, dir => $dir };
+            };
+            File::Find::find( { no_chdir => 1, wanted => $wanted }, $dir );
+        }
 	return @files;
 }
 
@@ -254,6 +259,20 @@ directory where you want to put the generated docs into.
 =item libroot
 
 your library's root directory
+
+You can set single path by string, or multiple by arrayref.
+
+    my $pd = Pod::ProjectDocs->new(
+		outroot => '/path/to/output/directory',
+		libroot => '/path/to/lib'
+	);
+
+or
+
+    my $pd = Pod::ProjectDocs->new(
+		outroot => '/path/to/output/directory',
+		libroot => ['/path/to/lib1', '/path/to/lib2'],
+	);
 
 =item title
 

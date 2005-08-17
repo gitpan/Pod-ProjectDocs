@@ -12,7 +12,7 @@ my($help, $out, $lib, $title, $desc, $charset, $index, $verbose);
 my %opt = (
 	'help|?'		=> \$help,
 	'out|o=s'		=> \$out,
-	'lib|l=s'		=> \$lib,
+	'lib|l=s@'		=> \$lib,
 	'title|t=s'		=> \$title,
 	'desc|d=s'		=> \$desc,
 	'charset|c=s'	=> \$charset,
@@ -55,6 +55,10 @@ pod2projdocs [options]
 
  you can set each options with their first alphabet.
  for example, you can write -o instead of -out.
+
+ And you can make documents from multiple library-directories.
+
+  pod2projdocs -o /path/to/outputdir -l /path/to/lib1 -l /path/to/lib2
 
 =head1 DESCRIPTION
 

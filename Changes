@@ -1,8 +1,11 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.06  Thu Aug 18 18:00:00 2005
+	- fixed to handle multiple 'libroot' by patch from Tatsuhiko Miyagawa.
+
 0.05  Fri Jun 24 18:00:00 2005
 	- fixed bug.
-		now you can indicate relative path for -lib and -out options.
+		now you can set relative path for -lib and -out options.
 
 0.02  Sat Jun 18 18:00:00 2005
     - CPAN release version;
