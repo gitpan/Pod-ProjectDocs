@@ -2,13 +2,17 @@ Changes
 Makefile.PL
 MANIFEST
 README
-bin/pod2projdocs
 t/00_compile.t
+bin/pod2projdocs
 lib/Pod/ProjectDocs.pm
 lib/Pod/ProjectDocs/File.pm
-lib/Pod/ProjectDocs/Doc.pm
 lib/Pod/ProjectDocs/CSS.pm
-lib/Pod/ProjectDocs/IndexPage.pm
 lib/Pod/ProjectDocs/ArrowImage.pm
-
+lib/Pod/ProjectDocs/Doc.pm
+lib/Pod/ProjectDocs/DocManager.pm
+lib/Pod/ProjectDocs/Template.pm
+lib/Pod/ProjectDocs/IndexPage.pm
+lib/Pod/ProjectDocs/Config.pm
+lib/Pod/ProjectDocs/Parser.pm
+lib/Pod/ProjectDocs/Parser/PerlPod.pm
 META.yml                                 Module meta-data (added by MakeMaker)

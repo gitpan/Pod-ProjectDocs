@@ -1,179 +1,78 @@
 package Pod::ProjectDocs::Doc;
 use strict;
+use warnings;
 use base qw/Pod::ProjectDocs::File/;
-use Pod::Xhtml;
 use File::Basename;
+use File::Spec;
 
-__PACKAGE__->mk_accessors(qw/
-	rel_path libroot origin name title author has_document
-/);
-
+__PACKAGE__->mk_accessors(qw/origin suffix origin_root title/);
 __PACKAGE__->data( do{ local $/; <DATA> } );
 
 sub _init {
-	my $self = shift;
-	my %args = @_;
+	my($self, %args) = @_;
+	$self->SUPER::_init(%args);
+	$self->origin(      $args{origin}      );
+	$self->origin_root( $args{origin_root} );
+	$self->suffix(      $args{suffix}      );
+	$self->_set_relpath;
+}
 
-	if(exists $args{origin} && $args{origin}){
-		$self->origin($args{origin});
-	}else{
-		$self->_croak("Set args [origin libroot outroot].");
-	}
-	if(exists $args{libroot} && $args{libroot}){
-		$self->libroot($args{libroot});
-	}else{
-		$self->_croak("Set args [origin libroot outroot].");
-	}
-	if(exists $args{outroot} && $args{outroot}){
-		$self->outroot($args{outroot});
-	}else{
-		$self->_croak("Set args [origin libroot outroot].");
-	}
-	my($name, $directory) = fileparse $self->origin, qr/\.(?:pm|pod)/;
-	$directory = File::Spec->abs2rel($directory, $self->libroot);
-	$directory ||= File::Spec->curdir;
-	$self->_check_dir($directory);
-	my $rel_path = File::Spec->catdir($directory, $name);
-	$self->name( join "-", File::Spec->splitdir($rel_path) );
-	$self->rel_path($rel_path.".html");
-	$self->SUPER::_init(
-		outroot => $self->outroot,
-		file	=> $name.".html",
-		dir		=> $directory,
-	);
+sub _set_relpath {
+	my $self   = shift;
+	my $suffix = $self->suffix;
+	my($name, $dir) = fileparse $self->origin, qr/\.$suffix/;
+	my $reldir = File::Spec->abs2rel($dir, $self->origin_root);
+	$reldir ||= File::Spec->curdir;
+	my $outroot = $self->config->outroot;
+	$self->_check_dir($reldir, $outroot);
+	$self->_check_dir($reldir, File::Spec->catdir($outroot, "src"));
+	my $relpath = File::Spec->catdir($reldir, $name);
+	$self->name( join "-", File::Spec->splitdir($relpath) );
+	$self->relpath($relpath.".html");
 }
 
 sub _check_dir {
-	my $self = shift;
-	my $dir  = shift;
+	my($self, $dir, $path) = @_;
 	my @dirs = File::Spec->splitdir($dir);
-	my $path = $self->outroot;
-	foreach(@dirs){
-		$path = File::Spec->catdir($path, $_);
-		unless(-e $path && -d $path){
+	foreach my $dir (@dirs) {
+		$path = File::Spec->catdir($path, $dir);
+		unless(-e $path && -d _) {
 			mkdir($path, 0755)
-				or $self->_croak("Can't make directory [$path].");
+			or $self->_croak(qq/Can't make directory [$path]./);
 		}
 	}
 }
 
-sub publish {
+sub _get_output_src_path {
 	my $self = shift;
-	my %args = @_;
-	my $charset = $args{charset} || 'UTF-8';
-	my $parser= Pod::Xhtml->new(
-		StringMode	=> 1,
-		MakeMeta	=> 0,
-		TopLinks	=> $args{arrow}->tag($self),
-		MakeIndex	=> $args{index},
-	);
-	$parser->addHeadText($args{css}->tag($self)."\n");
-	$parser->addHeadText(qq|<meta http-equiv="Content-Type" content="text/html; charset=$charset" />\n|);
-	$parser->addBodyOpenText($self->_save_data(
-		title => $args{title},
-		name  => $self->name,
-		mans  => $args{mans},
-		desc  => $args{desc},
-	));
-	local $SIG{__WARN__} = sub { };
-	$parser->addBodyOpenText(qq|\n<!-- DOCUMENT START -->\n|);
-	$parser->addBodyCloseText(qq|\n<!-- DOCUMENT END -->\n|);
-	$parser->parse_from_file($self->origin);
-	if( $self->_document_is_empty($parser->asStringRef) ){
-		$self->has_document(0);
-		return;
-	}
-	$self->has_document(1);
-	my $title  = $self->_get_title($parser);
-	my $author = $self->_get_author($parser);
-	$self->title($title);
-	$self->author($author);
-	my $fh = IO::File->new($self->path, "a")
-		or $self->_croak("Can't open ".$self->path.".");
-	$fh->seek(0, 0);
-	$fh->truncate(0);
-	$fh->print($parser->asString);
+	my $outroot = File::Spec->catdir($self->config->outroot, "src");
+	my $relpath = $self->relpath;
+	my $suffix  = $self->suffix;
+	$relpath =~ s/html$/$suffix/;
+	my $path = File::Spec->catfile($outroot, $relpath);
+	return $path;
+}
+
+sub copy_src {
+	my $self   = shift;
+	my $origin = $self->origin;
+	my $newsrc = $self->_get_output_src_path;
+	my $fh = IO::File->new($origin, "r")
+		or $self->_croak(qq/Can't open $origin./);
+	my @lines = $fh->getlines;
+	$fh->close;
+	$fh = IO::File->new($newsrc, "w")
+		or $self->_croak(qq/Can't open $newsrc./);
+	$fh->print($_) for @lines;
 	$fh->close;
 }
 
-sub _document_is_empty {
-	my $self	= shift;
-	my $docref	= shift;
-	(my $doc = $$docref) =~ s/(\r\n|\n)//g;
-	$doc =~ /<!-- DOCUMENT START -->(.*)<!-- DOCUMENT END -->/;
-	my $content = $1;
-	$content =~ s/<!-- INDEX START -->(.*)<!-- INDEX END -->//;
-	return $content =~ m!<div class="pod">(.+)</div>! ? 0 : 1;
-}
-
-sub _get_rel_path {
-	my $self = shift;
-	my $path = shift;
-	my($name, $directory) = fileparse $self->path, qr/\.html/;
-	return File::Spec->abs2rel($path, $directory);
-}
-
-sub _save_data {
-	my $self = shift;
-	my %args = @_;
-	my $text = '';
-
-	my $tt = Template->new({
-		FILTERS => {
-			relpath => sub {
-				my $path = shift;
-				return $self->_get_rel_path($path);
-			},
-			return2br => sub {
-				my $text = shift;
-				$text =~ s!\r\n!<br />!g;
-				$text =~ s!\n!<br />!g;
-				return $text;
-			},
-		},
-	});
-	my $html = $self->data;
-	$tt->process(\$html, {
-		title	=> $args{title},
-		desc	=> $args{desc},
-		name	=> $args{name},
-		outroot => File::Spec->catfile($self->outroot,'index.html'),
-	}, \$text)
-		or $self->_croak($tt->error);
-	return $text;
-}
-
-sub _get_author {
-	my $self = shift;
-	my $parser = shift;
-	my $author_node = 0;
-	my $author = '';
-	foreach my $node ( @{ $parser->parse_tree } ) {
-		if($node->{'-ptree'}[0] && $node->{'-ptree'}[0] eq 'AUTHOR'){
-			$author_node = 1; next;
-		}
-		if($author_node == 1){
-			$author = join "", @{ $node->{'-ptree'} }; last;
-		}
-	}
-	return $author;
-}
-
-sub _get_title {
-	my $self = shift;
-	my $parser = shift;
-	my $name_node = 0;
-	my $title = '';
-	foreach my $node ( @{ $parser->parse_tree } ){
-		if($node->{'-ptree'}[0] && $node->{'-ptree'}[0] eq 'NAME'){
-			$name_node = 1; next;
-		}
-		if($name_node == 1){
-			$title = join "", @{ $node->{'-ptree'} }; last;
-		}
-	}
-	$title =~ s/^\s*\S*\s*-\s(.*)$/$1/;
-	return $title;
+sub is_modified {
+	my $self   = shift;
+	my $origin = $self->origin;
+	my $newsrc = $self->_get_output_src_path;
+	return 1 unless( -e $newsrc );
+	return (-M $origin < -M $newsrc) ? 1 : 0;
 }
 
 1;
@@ -193,4 +92,6 @@ __DATA__
   <a href="[% outroot | relpath %]">[% title | html %]</a> >
   [% name | html %]
 </div>
+<a href="[% src | relpath %]">Source</a>
+
 

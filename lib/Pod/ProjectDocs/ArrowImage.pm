@@ -1,5 +1,6 @@
 package Pod::ProjectDocs::ArrowImage;
 use strict;
+use warnings;
 use base qw/Pod::ProjectDocs::File/;
 use MIME::Base64;
 use File::Basename;
@@ -9,14 +10,13 @@ __PACKAGE__->data( do{ local $/; <DATA> } );
 __PACKAGE__->is_bin(1);
 
 sub tag {
-	my $self = shift;
-	my $file = shift;
-	my($name, $path) = fileparse $file->path, qw/\.html/;
-	my $rel_path = File::Spec->abs2rel($self->path, $path);
-	return sprintf qq|<a href="#TOP" class="toplink"><img alt="^" src="%s"></a>|, $rel_path;
+	my($self, $doc) = @_;
+	my($name, $path) = fileparse $doc->_get_output_path, qw/\.html/;
+	my $relpath = File::Spec->abs2rel($self->_get_output_path, $path);
+	return sprintf qq|<a href="#TOP" class="toplink"><img alt="^" src="%s" /></a>|, $relpath;
 }
 
-sub _save_data {
+sub _get_data {
 	my $self = shift;
 	return decode_base64($self->data);
 }

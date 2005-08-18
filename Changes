@@ -1,5 +1,9 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.07  Thu Aug 18 23:00:00 2005
+	- add link to source file.
+    - fixed to check last modified time.
+
 0.06  Thu Aug 18 18:00:00 2005
 	- fixed to handle multiple 'libroot' by patch from Tatsuhiko Miyagawa.
 

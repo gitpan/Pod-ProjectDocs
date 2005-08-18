@@ -1,65 +1,101 @@
 package Pod::ProjectDocs;
 use strict;
-use base qw/Class::Accessor/;
+use warnings;
 
-use vars qw/$VERSION/;
-$VERSION = "0.06";
+use base qw/Class::Accessor::Fast/;
 
-use Pod::ProjectDocs::IndexPage;
-use Pod::ProjectDocs::Doc;
+use File::Spec;
+use Pod::ProjectDocs::DocManager;
+use Pod::ProjectDocs::Config;
+use Pod::ProjectDocs::Parser::PerlPod;
 use Pod::ProjectDocs::CSS;
 use Pod::ProjectDocs::ArrowImage;
-use File::Find ();
-use File::Spec;
+use Pod::ProjectDocs::IndexPage;
 
-use constant DEFAULT_TITLE   => "MyProject's Perl Modules";
-use constant DEFAULT_DESC	 => "manuals and modules";
-use constant DEFAULT_CHARSET => 'UTF-8';
+__PACKAGE__->mk_accessors(qw/managers components config/);
 
-__PACKAGE__->mk_accessors(qw/
-	title desc outroot libroot css charset arrow index verbose
-/);
+our $VERSION = '0.07';
 
 sub new {
 	my $class = shift;
-	my $self = bless {}, $class;
+	my $self  = bless { }, $class;
 	$self->_init(@_);
 	return $self;
 }
 
 sub _init {
 	my($self, %args) = @_;
-	$self->title($args{title} || DEFAULT_TITLE );
-	$self->desc($args{desc} || DEFAULT_DESC);
 
+	# set absolute path to 'outroot'
 	$args{outroot} ||= File::Spec->curdir;
 	$args{outroot} = File::Spec->rel2abs($args{outroot}, File::Spec->curdir)
-		unless File::Spec->file_name_is_absolute($args{outroot});	
-	$self->outroot($args{outroot});
+		unless File::Spec->file_name_is_absolute( $args{outroot} );
 
+	# set absolute path to 'libroot'
 	$args{libroot} ||= File::Spec->curdir;
-        $args{libroot} = [ $args{libroot} ] unless ref $args{libroot};
-	$args{libroot} = [ map File::Spec->rel2abs($_, File::Spec->curdir), @{$args{libroot}} ]
-		unless File::Spec->file_name_is_absolute($args{outroot});
-	$self->libroot($args{libroot});
+	$args{libroot} = [ $args{libroot} ] unless ref $args{libroot};
+	$args{libroot} = [ map {
+		File::Spec->file_name_is_absolute($_) ? $_
+		: File::Spec->rel2abs($_, File::Spec->curdir)
+	} @{ $args{libroot} } ];
 
-	$self->charset($args{charset} || DEFAULT_CHARSET);
-	$self->verbose($args{verbose});
-	$self->index($args{index});
-	$self->css( Pod::ProjectDocs::CSS->new(outroot => $self->outroot) );
-	$self->arrow( Pod::ProjectDocs::ArrowImage->new(outroot => $self->outroot) );
+	$self->config( Pod::ProjectDocs::Config->new(%args) );
 
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("output root:  [".$self->outroot."]");
-	$self->_message("library root: [". join(", ", @{$self->libroot}) ."]");
-	$self->_message("...");
+	$self->_setup_components;
+	$self->_setup_managers;
 }
 
-sub _message {
+sub _setup_components {
 	my $self = shift;
-	my $msg  = shift;
-	print STDERR $msg."\n" if $self->verbose;
+	$self->components( {} );
+	$self->components->{css}
+		= Pod::ProjectDocs::CSS->new( config => $self->config );
+	$self->components->{arrow}
+		= Pod::ProjectDocs::ArrowImage->new( config => $self->config );
+}
+
+sub _setup_managers {
+	my $self = shift;
+
+	$self->managers( [] );
+
+	push @{ $self->managers },
+		Pod::ProjectDocs::DocManager->new(
+			config     => $self->config,
+			components => $self->components,
+			desc       => qq/Perl Manuals/,
+			suffix     => qq/pod/,
+			parser     => Pod::ProjectDocs::Parser::PerlPod->new,
+		);
+
+	push @{ $self->managers },
+		Pod::ProjectDocs::DocManager->new(
+			config     => $self->config,
+			components => $self->components,
+			desc       => qq/Perl Modules/,
+			suffix     => qq/pm/,
+			parser     => Pod::ProjectDocs::Parser::PerlPod->new,
+		);
+}
+
+sub gen {
+	my $self = shift;
+
+	foreach my $comp_key ( keys %{ $self->components } ) {
+		my $comp = $self->components->{$comp_key};
+		$comp->publish;
+	}
+
+	foreach my $manager ( @{ $self->managers } ) {
+		$manager->publish;
+	}
+
+	my $index_page = Pod::ProjectDocs::IndexPage->new(
+		config		=> $self->config,
+		components	=> $self->components,
+		managers    => $self->managers,
+	);
+	$index_page->publish;
 }
 
 sub _croak {
@@ -68,155 +104,8 @@ sub _croak {
 	Carp::croak($msg);
 }
 
-sub gen {
-	my $self = shift;
-
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("checking output directory...");
-
-	$self->_message("...");
-	$self->_croak("[".$self->outroot."] doesn't exist or It's not a directory.")
-
-		unless(-e $self->outroot && -d $self->outroot);
-
-	$self->_message("output directory [".$self->outroot."] is ok.");
-
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("searching your perl-modules in your library directory [". join(", ", @{$self->libroot}) ."]...");
-	$self->_message("...");
-
-	my @modules = ();
-	foreach my $file ( sort { $a->{path} cmp $b->{path} } $self->_find_packages('pm') ) {
-
-		$self->_message("found $file->{path}.");
-
-		my $doc = Pod::ProjectDocs::Doc->new(
-			origin 	=> $file->{path},
-			outroot	=> $self->outroot,
-			libroot => $file->{dir},
-		);
-		push(@modules, $doc);
-	}
-
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("searching your pod-manuals in your library directory [". join(", ", @{$self->libroot}) ."]...");
-	$self->_message("...");
-
-	my @mans = ();
-	foreach my $file ( sort { $a->{path} cmp $b->{path} } $self->_find_packages('pod') ){
-
-		$self->_message("found $file->{path}.");
-
-		my $doc = Pod::ProjectDocs::Doc->new(
-			origin	=> $file->{path},
-			outroot => $self->outroot,
-			libroot => $file->{dir},
-		);
-		push(@mans, $doc);
-	}
-		
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("publishing css file [".$self->css->path."]...");
-	$self->_message("...");
-	$self->css->publish;
-	$self->_message("finished.");
-
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("publishing image file [".$self->arrow->path."]...");
-	$self->_message("...");
-	$self->arrow->publish;
-	$self->_message("finished.");
-
-	foreach my $doc ( @modules, @mans ){
-
-		$self->_message("...");
-		$self->_message("...");
-		$self->_message("publishing  [".$doc->path."]...");
-		$self->_message("...");
-
-		eval{
-
-		$doc->publish(
-			css     => $self->css,
-			arrow	=> $self->arrow,
-			index	=> $self->index,
-			title   => $self->title,
-			desc	=> $self->desc,
-			charset => $self->charset,
-		);
-
-		};
-		if($@){
-
-			$self->_message("failed.");
-			$self->_message("ERROR:[".$@."]");
-			next;
-		}
-
-		if($doc->has_document){
-
-			$self->_message("finished.");
-
-		}else{
-
-			$self->_message($doc->name." doesn't have document.");
-
-		}
-
-	}
-
-	my $index = Pod::ProjectDocs::IndexPage->new(
-		outroot => $self->outroot,
-	);
-
-	$self->_message("...");
-	$self->_message("...");
-	$self->_message("publishing index-page [".$index->path."]...");
-	$self->_message("...");
-
-	$index->publish(
-		title	=> $self->title,
-		desc	=> $self->desc,
-		css   	=> $self->css,
-		docs  	=> \@modules,
-		mans	=> \@mans,
-		charset	=> $self->charset,
-	);
-
-	$self->_message("finished.");
-	$self->_message("...");
-
-	$self->_message("completed!");
-	$self->_message("...");
-	$self->_message("See [".$index->path."] via HTTP with your browser.");
-}
-
-sub _find_packages {
-	my $self = shift;
-	my $suffix = shift;
-	my $search = $self->libroot;
-        for my $dir (@$search) {
-            $self->_croak("$dir isn't detected or it's not a directory.")
-		unless( -e $dir && -d _ );
-        }
-	my @files  = ();
-        for my $dir (@$search) {
-            my $wanted = sub {
-		return unless $File::Find::name =~ /\.$suffix$/;
-		(my $path = $File::Find::name ) =~ s#^\\.##;
-		push @files, { path => $path, dir => $dir };
-            };
-            File::Find::find( { no_chdir => 1, wanted => $wanted }, $dir );
-        }
-	return @files;
-}
-
 1;
+__END__
 
 =head1 NAME
 
@@ -327,4 +216,3 @@ it under the same terms as Perl itself, either Perl version 5.8.5 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-

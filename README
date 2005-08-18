@@ -1,4 +1,4 @@
-Pod-ProjectDocs version 0.06
+Pod-ProjectDocs version 0.01
 ============================
 
 The README is used to introduce the module and provide instructions on
@@ -23,9 +23,13 @@ To install this module type the following:
 
 DEPENDENCIES
 
-Pod::Xhtml
+This module requires these other modules and libraries:
+
+  blah blah blah
 
 COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
 
 Copyright (C) 2005 by A. U. Thor
 
