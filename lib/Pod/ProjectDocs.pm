@@ -14,7 +14,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
 	my $class = shift;
@@ -56,25 +56,26 @@ sub _setup_components {
 
 sub _setup_managers {
 	my $self = shift;
+	$self->reset_managers();
+	$self->add_manager('Perl Manuals', 'pod', Pod::ProjectDocs::Parser::PerlPod->new);
+	$self->add_manager('Perl Modules', 'pm',  Pod::ProjectDocs::Parser::PerlPod->new);
+	$self->add_manager('JavaScript Libraries', 'js', Pod::ProjectDocs::Parser::PerlPod->new);
+}
 
+sub reset_managers {
+	my $self = shift;
 	$self->managers( [] );
+}
 
+sub add_manager {
+	my($self, $desc, $suffix, $parser) = @_;
 	push @{ $self->managers },
 		Pod::ProjectDocs::DocManager->new(
 			config     => $self->config,
 			components => $self->components,
-			desc       => qq/Perl Manuals/,
-			suffix     => qq/pod/,
-			parser     => Pod::ProjectDocs::Parser::PerlPod->new,
-		);
-
-	push @{ $self->managers },
-		Pod::ProjectDocs::DocManager->new(
-			config     => $self->config,
-			components => $self->components,
-			desc       => qq/Perl Modules/,
-			suffix     => qq/pm/,
-			parser     => Pod::ProjectDocs::Parser::PerlPod->new,
+			desc       => $desc,
+			suffix     => $suffix,
+			parser     => $parser,
 		);
 }
 
@@ -128,7 +129,7 @@ Pod::ProjectDocs - generates CPAN like pod pages
 
 =head1 DESCRIPTION
 
-This module allows you to generates CPAN like pod pages from your modules
+This module allows you to generates CPAN like pod pages from your modules (not only perl but also javascript including pod)
 for your projects. Set your library modules' root directory with libroot option.
 And you have to set output directory's path with outroot option.
 And this module searches your pm and pod files from your libroot, and generates

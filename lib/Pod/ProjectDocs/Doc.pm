@@ -89,7 +89,7 @@ __DATA__
   </form>
 </div>
 <div class="path">
-  <a href="[% outroot | relpath %]">[% title | html %]</a> >
+  <a href="[% outroot | relpath %]">[% title | html %]</a> > [% mgr_desc | html %] >
   [% name | html %]
 </div>
 <a href="[% src | relpath %]">Source</a>

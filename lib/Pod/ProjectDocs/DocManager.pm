@@ -24,6 +24,7 @@ sub new {
 
 sub _init {
 	my($self, %args) = @_;
+	$args{suffix} = [ $args{suffix} ] unless ref $args{suffix};
 	$self->config(     $args{config}     );
 	$self->desc(       $args{desc}       );
 	$self->suffix(     $args{suffix}     );
@@ -38,7 +39,7 @@ sub publish {
 	foreach my $doc ( @{ $self->docs } ) {
 		if ( $doc->is_modified ) {
 			$doc->copy_src;
-			my $data = $self->parser->create_html($doc, $self->components);
+			my $data = $self->parser->create_html($doc, $self->components, $self->desc);
 			$doc->publish($data);
 		}
 	}
@@ -51,8 +52,9 @@ sub _find_files {
 		$self->_craok(qq/$dir isn't detected or it's not a directory./);
 		}
 	}
-	my $suffix = $self->suffix;
+	my $suffixs = $self->suffix;
 	foreach my $dir ( @{ $self->config->libroot } ) {
+		foreach my $suffix ( @$suffixs ) {
 		my $wanted = sub {
 			return unless $File::Find::name =~ /\.$suffix$/;
 			(my $path = $File::Find::name) =~ s#^\\.##;
@@ -65,7 +67,9 @@ sub _find_files {
 				);
 		};
 		File::Find::find( { no_chdir => 1, wanted => $wanted }, $dir );
+		}
 	}
+	$self->docs( sort{ $a->name cmp $b->name } @{ $self->docs } );
 }
 
 sub _croak {
