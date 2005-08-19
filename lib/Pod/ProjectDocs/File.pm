@@ -29,7 +29,7 @@ sub _get_data {
 sub publish {
 	my($self, $data) = @_;
 	$data ||= $self->_get_data();
-	my $path = $self->_get_output_path;
+	my $path = $self->get_output_path;
 	my $fh = IO::File->new($path, "a")
 		or $self->_croak(qq/Can't open $path./);
 	$fh->seek(0, 0);
@@ -38,7 +38,7 @@ sub publish {
 	$fh->close;
 }
 
-sub _get_output_path {
+sub get_output_path {
 	my $self = shift;
 	my $outroot = $self->config->outroot;
 	my $relpath = $self->relpath || $self->default_name;

@@ -12,7 +12,6 @@ __PACKAGE__->mk_accessors(qw/
 	suffix
 	parser
 	docs
-	components
 /);
 
 sub new {
@@ -25,24 +24,12 @@ sub new {
 sub _init {
 	my($self, %args) = @_;
 	$args{suffix} = [ $args{suffix} ] unless ref $args{suffix};
-	$self->config(     $args{config}     );
-	$self->desc(       $args{desc}       );
-	$self->suffix(     $args{suffix}     );
-	$self->parser(     $args{parser}     );
-	$self->components( $args{components} );
+	$self->config( $args{config} );
+	$self->desc(   $args{desc}   );
+	$self->suffix( $args{suffix} );
+	$self->parser( $args{parser} );
 	$self->docs( [] );
-}
-
-sub publish {
-	my $self = shift;
 	$self->_find_files;
-	foreach my $doc ( @{ $self->docs } ) {
-		if ( $doc->is_modified ) {
-			$doc->copy_src;
-			my $data = $self->parser->create_html($doc, $self->components, $self->desc);
-			$doc->publish($data);
-		}
-	}
 }
 
 sub _find_files {
@@ -72,10 +59,58 @@ sub _find_files {
 	$self->docs( sort{ $a->name cmp $b->name } @{ $self->docs } );
 }
 
+sub get_docs_num {
+	my $self = shift;
+	return scalar @{ $self->docs };
+}
+
+sub get_doc_at {
+	my($self, $index) = @_;
+	return $self->docs->[ $index ];
+}
+
+sub doc_iterator {
+	my $self = shift;
+	return Pod::ProjectDocs::DocManager::Iterator->new($self);
+}
+
 sub _croak {
 	my($self, $msg) = @_;
 	require Carp;
 	Carp::croak($msg);
+}
+
+package Pod::ProjectDocs::DocManager::Iterator;
+use base qw/Class::Accessor::Fast/;
+__PACKAGE__->mk_accessors(qw/manager index/);
+
+sub new {
+	my $class = shift;
+	my $self  = bless { }, $class;
+	$self->_init(@_);
+	return $self;
+}
+
+sub _init {
+	my($self, $manager) = @_;
+	$self->index(0);
+	$self->manager($manager);
+}
+
+sub next {
+	my $self = shift;
+	if ( $self->manager->get_docs_num > $self->index ) {
+		my $doc  = $self->manager->get_doc_at( $self->index );
+		$self->index( $self->index + 1 );
+		return $doc;
+	} else {
+		return undef;
+	}
+}
+
+sub reset {
+	my $self = shift;
+	$self->index(0);
 }
 
 1;

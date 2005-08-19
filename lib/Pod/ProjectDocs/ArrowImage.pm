@@ -11,8 +11,8 @@ __PACKAGE__->is_bin(1);
 
 sub tag {
 	my($self, $doc) = @_;
-	my($name, $path) = fileparse $doc->_get_output_path, qw/\.html/;
-	my $relpath = File::Spec->abs2rel($self->_get_output_path, $path);
+	my($name, $path) = fileparse $doc->get_output_path, qw/\.html/;
+	my $relpath = File::Spec->abs2rel($self->get_output_path, $path);
 	return sprintf qq|<a href="#TOP" class="toplink"><img alt="^" src="%s" /></a>|, $relpath;
 }
 

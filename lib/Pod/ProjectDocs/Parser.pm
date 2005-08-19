@@ -23,8 +23,8 @@ __PACKAGE__->SEQ( {
 	Z => \&seqZ,
 } );
 
-sub create_html {
-	my($self, $doc, $components) = @_;
+sub gen_html {
+	my($self, %args) = @_;
 }
 
 ########## New PUBLIC methods for this class

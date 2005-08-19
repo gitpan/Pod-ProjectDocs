@@ -35,7 +35,7 @@ sub _init {
 
 sub process {
 	my($self, $doc, $data, $output) = @_;
-	$self->{_curpath} = $doc->_get_output_path;
+	$self->{_curpath} = $doc->get_output_path;
 	$self->{_tt}->process(\$data, $output, \my $text)
 		or $self->_croak($self->{_tt}->error);
 	$self->{_curpath} = '';

@@ -1,5 +1,8 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.09  Sat Aug 20 02:00:00 2005
+	- fixed problem about namespace confliction between '.pm' and '.js'.
+
 0.08  Fri Aug 19 12:00:00 2005
 	- fixed not to use Pod::Xhtml.
     - add manager for javascript libraries.

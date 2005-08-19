@@ -14,7 +14,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new {
 	my $class = shift;
@@ -41,8 +41,8 @@ sub _init {
 
 	$self->config( Pod::ProjectDocs::Config->new(%args) );
 
-	$self->_setup_components;
-	$self->_setup_managers;
+	$self->_setup_components();
+	$self->_setup_managers();
 }
 
 sub _setup_components {
@@ -72,7 +72,6 @@ sub add_manager {
 	push @{ $self->managers },
 		Pod::ProjectDocs::DocManager->new(
 			config     => $self->config,
-			components => $self->components,
 			desc       => $desc,
 			suffix     => $suffix,
 			parser     => $parser,
@@ -84,11 +83,22 @@ sub gen {
 
 	foreach my $comp_key ( keys %{ $self->components } ) {
 		my $comp = $self->components->{$comp_key};
-		$comp->publish;
+		$comp->publish();
 	}
 
 	foreach my $manager ( @{ $self->managers } ) {
-		$manager->publish;
+		my $ite = $manager->doc_iterator();
+		while ( my $doc = $ite->next ) {
+			if ( $doc->is_modified ) {
+				$doc->copy_src();
+				my $html = $manager->parser->gen_html(
+					doc        => $doc,
+					desc       => $manager->desc,
+					components => $self->components,
+				);
+				$doc->publish($html);
+			}
+		}
 	}
 
 	my $index_page = Pod::ProjectDocs::IndexPage->new(
@@ -96,7 +106,7 @@ sub gen {
 		components	=> $self->components,
 		managers    => $self->managers,
 	);
-	$index_page->publish;
+	$index_page->publish();
 }
 
 sub _croak {
@@ -202,7 +212,7 @@ or
 
 =head1 SEE ALSO
 
-L<Pod::Xhtml>
+L<Pod::Parser>
 
 =head1 AUTHOR
 

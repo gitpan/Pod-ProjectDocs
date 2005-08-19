@@ -4,8 +4,11 @@ use warnings;
 use base qw/Pod::ProjectDocs::Parser/;
 use Pod::ProjectDocs::Template;
 
-sub create_html {
-	my($self, $doc, $components, $mgr_desc) = @_;
+sub gen_html {
+	my($self, %args) = @_;
+	my $doc        = $args{doc};
+	my $components = $args{components};
+	my $mgr_desc   = $args{desc};
 	$self->_prepare($doc, $components, $mgr_desc);
 	local $SIG{__WARN__} = sub { };
 	$self->parse_from_file($doc->origin);
@@ -52,7 +55,7 @@ sub _get_data {
 		desc     => $doc->config->desc,
 		name     => $doc->name,
 		outroot  => $doc->config->outroot,
-		src      => $doc->_get_output_src_path,
+		src      => $doc->get_output_src_path,
 		mgr_desc => $mgr_desc,
 	});
 	return $text;

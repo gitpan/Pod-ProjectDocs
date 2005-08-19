@@ -28,7 +28,7 @@ sub _set_relpath {
 	$self->_check_dir($reldir, File::Spec->catdir($outroot, "src"));
 	my $relpath = File::Spec->catdir($reldir, $name);
 	$self->name( join "-", File::Spec->splitdir($relpath) );
-	$self->relpath($relpath.".html");
+	$self->relpath($relpath.".".$suffix.".html");
 }
 
 sub _check_dir {
@@ -43,12 +43,12 @@ sub _check_dir {
 	}
 }
 
-sub _get_output_src_path {
+sub get_output_src_path {
 	my $self = shift;
 	my $outroot = File::Spec->catdir($self->config->outroot, "src");
 	my $relpath = $self->relpath;
 	my $suffix  = $self->suffix;
-	$relpath =~ s/html$/$suffix/;
+	$relpath =~ s/\.html$//;
 	my $path = File::Spec->catfile($outroot, $relpath);
 	return $path;
 }
@@ -56,7 +56,7 @@ sub _get_output_src_path {
 sub copy_src {
 	my $self   = shift;
 	my $origin = $self->origin;
-	my $newsrc = $self->_get_output_src_path;
+	my $newsrc = $self->get_output_src_path;
 	my $fh = IO::File->new($origin, "r")
 		or $self->_croak(qq/Can't open $origin./);
 	my @lines = $fh->getlines;
@@ -70,7 +70,7 @@ sub copy_src {
 sub is_modified {
 	my $self   = shift;
 	my $origin = $self->origin;
-	my $newsrc = $self->_get_output_src_path;
+	my $newsrc = $self->get_output_src_path;
 	return 1 unless( -e $newsrc );
 	return (-M $origin < -M $newsrc) ? 1 : 0;
 }
