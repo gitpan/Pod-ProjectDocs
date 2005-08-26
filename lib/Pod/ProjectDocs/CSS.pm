@@ -8,10 +8,10 @@ __PACKAGE__->default_name('podstyle.css');
 __PACKAGE__->data( do{ local $/; <DATA> } );
 
 sub tag {
-	my($self, $doc) = @_;
-	my($name, $path) = fileparse $doc->get_output_path, qw/\.html/;
-	my $relpath = File::Spec->abs2rel($self->get_output_path, $path);
-	return sprintf qq|<link rel="stylesheet" type="text/css" href="%s" />|, $relpath;
+    my($self, $doc) = @_;
+    my($name, $path) = fileparse $doc->get_output_path, qw/\.html/;
+    my $relpath = File::Spec->abs2rel($self->get_output_path, $path);
+    return sprintf qq|<link rel="stylesheet" type="text/css" href="%s" />|, $relpath;
 }
 
 1;

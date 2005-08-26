@@ -10,15 +10,15 @@ __PACKAGE__->data( do{ local $/; <DATA> } );
 __PACKAGE__->is_bin(1);
 
 sub tag {
-	my($self, $doc) = @_;
-	my($name, $path) = fileparse $doc->get_output_path, qw/\.html/;
-	my $relpath = File::Spec->abs2rel($self->get_output_path, $path);
-	return sprintf qq|<a href="#TOP" class="toplink"><img alt="^" src="%s" /></a>|, $relpath;
+    my($self, $doc) = @_;
+    my($name, $path) = fileparse $doc->get_output_path, qw/\.html/;
+    my $relpath = File::Spec->abs2rel($self->get_output_path, $path);
+    return sprintf qq|<a href="#TOP" class="toplink"><img alt="^" src="%s" /></a>|, $relpath;
 }
 
 sub _get_data {
-	my $self = shift;
-	return decode_base64($self->data);
+    my $self = shift;
+    return decode_base64($self->data);
 }
 
 1;

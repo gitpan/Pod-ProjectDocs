@@ -14,105 +14,106 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 sub new {
-	my $class = shift;
-	my $self  = bless { }, $class;
-	$self->_init(@_);
-	return $self;
+    my $class = shift;
+    my $self  = bless { }, $class;
+    $self->_init(@_);
+    return $self;
 }
 
 sub _init {
-	my($self, %args) = @_;
+    my($self, %args) = @_;
 
-	# set absolute path to 'outroot'
-	$args{outroot} ||= File::Spec->curdir;
-	$args{outroot} = File::Spec->rel2abs($args{outroot}, File::Spec->curdir)
-		unless File::Spec->file_name_is_absolute( $args{outroot} );
+    # set absolute path to 'outroot'
+    $args{outroot} ||= File::Spec->curdir;
+    $args{outroot} = File::Spec->rel2abs($args{outroot}, File::Spec->curdir)
+        unless File::Spec->file_name_is_absolute( $args{outroot} );
 
-	# set absolute path to 'libroot'
-	$args{libroot} ||= File::Spec->curdir;
-	$args{libroot} = [ $args{libroot} ] unless ref $args{libroot};
-	$args{libroot} = [ map {
-		File::Spec->file_name_is_absolute($_) ? $_
-		: File::Spec->rel2abs($_, File::Spec->curdir)
-	} @{ $args{libroot} } ];
+    # set absolute path to 'libroot'
+    $args{libroot} ||= File::Spec->curdir;
+    $args{libroot} = [ $args{libroot} ] unless ref $args{libroot};
+    $args{libroot} = [ map {
+        File::Spec->file_name_is_absolute($_) ? $_
+        : File::Spec->rel2abs($_, File::Spec->curdir)
+    } @{ $args{libroot} } ];
 
-	$self->config( Pod::ProjectDocs::Config->new(%args) );
+    $self->config( Pod::ProjectDocs::Config->new(%args) );
 
-	$self->_setup_components();
-	$self->_setup_managers();
+    $self->_setup_components();
+    $self->_setup_managers();
 }
 
 sub _setup_components {
-	my $self = shift;
-	$self->components( {} );
-	$self->components->{css}
-		= Pod::ProjectDocs::CSS->new( config => $self->config );
-	$self->components->{arrow}
-		= Pod::ProjectDocs::ArrowImage->new( config => $self->config );
+    my $self = shift;
+    $self->components( {} );
+    $self->components->{css}
+        = Pod::ProjectDocs::CSS->new( config => $self->config );
+    $self->components->{arrow}
+        = Pod::ProjectDocs::ArrowImage->new( config => $self->config );
 }
 
 sub _setup_managers {
-	my $self = shift;
-	$self->reset_managers();
-	$self->add_manager('Perl Manuals', 'pod', Pod::ProjectDocs::Parser::PerlPod->new);
-	$self->add_manager('Perl Modules', 'pm',  Pod::ProjectDocs::Parser::PerlPod->new);
-	$self->add_manager('JavaScript Libraries', 'js', Pod::ProjectDocs::Parser::PerlPod->new);
+    my $self = shift;
+    $self->reset_managers();
+    $self->add_manager('Perl Manuals', 'pod', Pod::ProjectDocs::Parser::PerlPod->new);
+    $self->add_manager('Perl Modules', 'pm',  Pod::ProjectDocs::Parser::PerlPod->new);
+	$self->add_manager('Trigger Scripts', ['cgi', 'pl'], Pod::ProjectDocs::Parser::PerlPod->new);
+    $self->add_manager('JavaScript Libraries', 'js', Pod::ProjectDocs::Parser::PerlPod->new);
 }
 
 sub reset_managers {
-	my $self = shift;
-	$self->managers( [] );
+    my $self = shift;
+    $self->managers( [] );
 }
 
 sub add_manager {
-	my($self, $desc, $suffix, $parser) = @_;
-	push @{ $self->managers },
-		Pod::ProjectDocs::DocManager->new(
-			config     => $self->config,
-			desc       => $desc,
-			suffix     => $suffix,
-			parser     => $parser,
-		);
+    my($self, $desc, $suffix, $parser) = @_;
+    push @{ $self->managers },
+        Pod::ProjectDocs::DocManager->new(
+            config => $self->config,
+            desc   => $desc,
+            suffix => $suffix,
+            parser => $parser,
+        );
 }
 
 sub gen {
-	my $self = shift;
+    my $self = shift;
 
-	foreach my $comp_key ( keys %{ $self->components } ) {
-		my $comp = $self->components->{$comp_key};
-		$comp->publish();
-	}
+    foreach my $comp_key ( keys %{ $self->components } ) {
+        my $comp = $self->components->{$comp_key};
+        $comp->publish();
+    }
 
-	foreach my $manager ( @{ $self->managers } ) {
-		my $ite = $manager->doc_iterator();
-		while ( my $doc = $ite->next ) {
-			if ( $doc->is_modified ) {
-				$doc->copy_src();
-				my $html = $manager->parser->gen_html(
-					doc        => $doc,
-					desc       => $manager->desc,
-					components => $self->components,
-				);
-				$doc->publish($html);
-			}
-		}
-	}
+    foreach my $manager ( @{ $self->managers } ) {
+        my $ite = $manager->doc_iterator();
+        while ( my $doc = $ite->next ) {
+            if ( $doc->is_modified ) {
+                $doc->copy_src();
+                my $html = $manager->parser->gen_html(
+                    doc        => $doc,
+                    desc       => $manager->desc,
+                    components => $self->components,
+                );
+                $doc->publish($html);
+            }
+        }
+    }
 
-	my $index_page = Pod::ProjectDocs::IndexPage->new(
-		config		=> $self->config,
-		components	=> $self->components,
-		managers    => $self->managers,
-	);
-	$index_page->publish();
+    my $index_page = Pod::ProjectDocs::IndexPage->new(
+        config     => $self->config,
+        components => $self->components,
+        managers   => $self->managers,
+    );
+    $index_page->publish();
 }
 
 sub _croak {
-	my($self, $msg) = @_;
-	require Carp;
-	Carp::croak($msg);
+    my($self, $msg) = @_;
+    require Carp;
+    Carp::croak($msg);
 }
 
 1;
@@ -124,18 +125,18 @@ Pod::ProjectDocs - generates CPAN like pod pages
 
 =head1 SYNOPSIS
 
-	#!/usr/bin/perl -w
-	use strict;
-	use Pod::ProjectDocs;
-	my $pd = Pod::ProjectDocs->new(
-		outroot	=> '/output/directory',
-		libroot => '/your/project/lib/root',
-		title	=> 'ProjectName',
-	);
-	$pd->gen();
+    #!/usr/bin/perl -w
+    use strict;
+    use Pod::ProjectDocs;
+    my $pd = Pod::ProjectDocs->new(
+        outroot => '/output/directory',
+        libroot => '/your/project/lib/root',
+        title   => 'ProjectName',
+    );
+    $pd->gen();
 
-	#or use pod2projdocs on your shell
-	pod2projdocs -out /output/directory -lib /your/project/lib/root
+    #or use pod2projdocs on your shell
+    pod2projdocs -out /output/directory -lib /your/project/lib/root
 
 =head1 DESCRIPTION
 
@@ -163,16 +164,16 @@ your library's root directory
 You can set single path by string, or multiple by arrayref.
 
     my $pd = Pod::ProjectDocs->new(
-		outroot => '/path/to/output/directory',
-		libroot => '/path/to/lib'
-	);
+        outroot => '/path/to/output/directory',
+        libroot => '/path/to/lib'
+    );
 
 or
 
     my $pd = Pod::ProjectDocs->new(
-		outroot => '/path/to/output/directory',
-		libroot => ['/path/to/lib1', '/path/to/lib2'],
-	);
+        outroot => '/path/to/output/directory',
+        libroot => ['/path/to/lib1', '/path/to/lib2'],
+    );
 
 =item title
 
@@ -204,11 +205,11 @@ You need not to write script with this module,
 I put the script named 'pod2projdocs' in this package.
 At first, please execute follows.
 
-	pod2projdocs -help
+    pod2projdocs -help
 
 or
 
-	pod2projdocs -?
+    pod2projdocs -?
 
 =head1 SEE ALSO
 
