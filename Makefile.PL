@@ -4,7 +4,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Pod/ProjectDocs.pm', # finds $VERSION
 	EXE_FILES         => ['bin/pod2projdocs'],
     PREREQ_PM         => {
-		Pod::Parser => 0,
+		Pod::Parser => 1.32,
 		Pod::ParseUtils => 0,
 		Class::Accessor::Fast => 0,
 		Class::Data::Inheritable => 0,

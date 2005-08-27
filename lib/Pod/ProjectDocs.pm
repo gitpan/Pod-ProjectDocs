@@ -14,7 +14,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my $class = shift;
