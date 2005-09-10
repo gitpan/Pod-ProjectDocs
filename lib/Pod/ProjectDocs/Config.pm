@@ -14,6 +14,7 @@ __PACKAGE__->mk_accessors(qw/
     index
     outroot
     libroot
+    forcegen
 /);
 
 Readonly my $DEFAULT_TITLE   => qq/MyProject's Libraries/;
@@ -36,6 +37,7 @@ sub _init {
     $self->index(   $args{index}                       );
     $self->outroot( $args{outroot}                     );
     $self->libroot( $args{libroot}                     );
+    $self->forcegen( $args{forcegen}                   );
 }
 
 1;

@@ -1,18 +1,21 @@
-Changes
-Makefile.PL
-MANIFEST
-README
-t/00_compile.t
 bin/pod2projdocs
+Changes
 lib/Pod/ProjectDocs.pm
-lib/Pod/ProjectDocs/File.pm
-lib/Pod/ProjectDocs/CSS.pm
 lib/Pod/ProjectDocs/ArrowImage.pm
+lib/Pod/ProjectDocs/Config.pm
+lib/Pod/ProjectDocs/CSS.pm
 lib/Pod/ProjectDocs/Doc.pm
 lib/Pod/ProjectDocs/DocManager.pm
-lib/Pod/ProjectDocs/Template.pm
+lib/Pod/ProjectDocs/File.pm
 lib/Pod/ProjectDocs/IndexPage.pm
-lib/Pod/ProjectDocs/Config.pm
 lib/Pod/ProjectDocs/Parser.pm
 lib/Pod/ProjectDocs/Parser/PerlPod.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+lib/Pod/ProjectDocs/Template.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_compile.t
+t/01_project.t
+t/sample/lib/Sample/Module.pm
+t/sample/lib/Sample/Project.pm

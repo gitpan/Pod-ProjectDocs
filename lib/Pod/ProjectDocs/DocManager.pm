@@ -59,6 +59,12 @@ sub _find_files {
     $self->docs( [ sort{ $a->name cmp $b->name } @{ $self->docs } ] );
 }
 
+sub get_doc_names {
+    my $self  = shift;
+    my @names = map { $_->name } @{ $self->docs };
+    return wantarray ? @names : \@names;
+}
+
 sub get_docs_num {
     my $self = shift;
     return scalar @{ $self->docs };

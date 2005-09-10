@@ -8,13 +8,14 @@ use File::Spec;
 use Pod::ProjectDocs::DocManager;
 use Pod::ProjectDocs::Config;
 use Pod::ProjectDocs::Parser::PerlPod;
+use Pod::ProjectDocs::Parser::JavaScriptPod;
 use Pod::ProjectDocs::CSS;
 use Pod::ProjectDocs::ArrowImage;
 use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub new {
     my $class = shift;
@@ -39,6 +40,9 @@ sub _init {
         : File::Spec->rel2abs($_, File::Spec->curdir)
     } @{ $args{libroot} } ];
 
+    # check mtime by default, but can be overridden
+    $args{forcegen} ||= 0;
+
     $self->config( Pod::ProjectDocs::Config->new(%args) );
 
     $self->_setup_components();
@@ -60,7 +64,7 @@ sub _setup_managers {
     $self->add_manager('Perl Manuals', 'pod', Pod::ProjectDocs::Parser::PerlPod->new);
     $self->add_manager('Perl Modules', 'pm',  Pod::ProjectDocs::Parser::PerlPod->new);
 	$self->add_manager('Trigger Scripts', ['cgi', 'pl'], Pod::ProjectDocs::Parser::PerlPod->new);
-    $self->add_manager('JavaScript Libraries', 'js', Pod::ProjectDocs::Parser::PerlPod->new);
+    $self->add_manager('JavaScript Libraries', 'js', Pod::ProjectDocs::Parser::JavaScriptPod->new);
 }
 
 sub reset_managers {
@@ -87,10 +91,35 @@ sub gen {
         $comp->publish();
     }
 
+    my @perl_modules;
+    my @js_libraries;
     foreach my $manager ( @{ $self->managers } ) {
+        next if $manager->desc !~ /(Perl Modules|JavaScript Libraries)/;
         my $ite = $manager->doc_iterator();
         while ( my $doc = $ite->next ) {
-            if ( $doc->is_modified ) {
+            my $name = $doc->name;
+            my $path = $doc->get_output_path;
+            if ($manager->desc eq 'Perl Modules') {
+                $name =~ s/\-/\:\:/g;
+                push @perl_modules, { name => $name, path => $path };
+            }
+            elsif ($manager->desc eq 'JavaScript Libraries') {
+                $name =~ s/\-/\./g;
+                push @js_libraries, { name => $name, path => $path };
+            }
+        }
+    }
+
+    foreach my $manager ( @{ $self->managers } ) {
+
+        $manager->parser->local_modules( {
+            perl       => \@perl_modules,
+            javascript => \@js_libraries,
+        } );
+
+        my $ite = $manager->doc_iterator();
+        while ( my $doc = $ite->next ) {
+            if ( $self->config->forcegen || $doc->is_modified ) {
                 $doc->copy_src();
                 my $html = $manager->parser->gen_html(
                     doc        => $doc,
@@ -196,6 +225,10 @@ set 1 or 0.
 
 whether you want to show messages on your shell or not.
 set 1 or 0.
+
+=item forcegen
+
+whether you want to generate HTML document even if source files are not updated. default is 0.
 
 =back
 
