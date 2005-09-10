@@ -16,10 +16,11 @@ __PACKAGE__->SEQ( {
     B => \&seqB,
     C => \&seqC,
     E => \&seqE,
-    F => \&seqI,
-    I => \&seqL,
-    L => \&seqS,
-    S => \&seqX,
+    F => \&seqF,
+    I => \&seqI,
+    L => \&seqL,
+    S => \&seqS,
+    X => \&seqX,
     Z => \&seqZ,
 } );
 

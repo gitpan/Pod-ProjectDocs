@@ -1,5 +1,9 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.14 Sat Sep 3 11:56:00 2005
+    - fixed mismapping in Pod::ProjectDocs::Parser
+      found by Tatsuhiko Miyagawa.
+
 0.13  Sat Aug 27 14:00:00 2005
     - fixed Makefile.PL, to remove bug appears in old version of Pod::Parser.
       Reported by Tatsuhiko Miyagawa.
