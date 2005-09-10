@@ -11,8 +11,10 @@ WriteMakefile(
 		File::Spec => 0,
 		File::Basename => 0,
 		File::Find => 0,
+        File::Copy => 0,
 		MIME::Base64 => 0,
 		Template => 0,
 		Readonly => 0,
+        URI::Escape => 0,
 	}, # e.g., Module::Name => 1.1
 );

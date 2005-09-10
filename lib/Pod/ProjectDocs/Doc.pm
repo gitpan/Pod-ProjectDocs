@@ -4,6 +4,7 @@ use warnings;
 use base qw/Pod::ProjectDocs::File/;
 use File::Basename;
 use File::Spec;
+use File::Copy;
 
 __PACKAGE__->mk_accessors(qw/origin suffix origin_root title/);
 __PACKAGE__->data( do{ local $/; <DATA> } );
@@ -63,14 +64,7 @@ sub copy_src {
     my $self   = shift;
     my $origin = $self->origin;
     my $newsrc = $self->get_output_src_path;
-    my $fh = IO::File->new($origin, "r")
-        or $self->_croak(qq/Can't open $origin./);
-    my @lines = $fh->getlines;
-    $fh->close;
-    $fh = IO::File->new($newsrc, "w")
-        or $self->_croak(qq/Can't open $newsrc./);
-    $fh->print($_) for @lines;
-    $fh->close;
+    File::Copy::copy($origin, $newsrc);
 }
 
 sub is_modified {

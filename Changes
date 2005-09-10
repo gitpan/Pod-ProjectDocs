@@ -1,5 +1,8 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.16 Sun Sep 4 00:07:00 2005
+    - fixed Makefile.PL
+
 0.15 Sat Sep 3 22:04:00 2005
     - added option 'forcegen'
     - fixed parser, now it creates link for L<foo> properly.
