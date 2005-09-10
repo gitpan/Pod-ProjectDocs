@@ -10,6 +10,7 @@ lib/Pod/ProjectDocs/File.pm
 lib/Pod/ProjectDocs/IndexPage.pm
 lib/Pod/ProjectDocs/Parser.pm
 lib/Pod/ProjectDocs/Parser/PerlPod.pm
+lib/Pod/ProjectDocs/Parser/JavaScriptPod.pm
 lib/Pod/ProjectDocs/Template.pm
 Makefile.PL
 MANIFEST

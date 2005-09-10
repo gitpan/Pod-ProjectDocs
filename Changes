@@ -1,5 +1,8 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.17 Sun Sep 4 00:07:00 2005
+    - fixed MANIFEST
+
 0.16 Sun Sep 4 00:07:00 2005
     - fixed Makefile.PL
 
