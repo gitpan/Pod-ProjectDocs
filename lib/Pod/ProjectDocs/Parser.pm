@@ -509,7 +509,7 @@ sub _setTitle {
 
 sub _htmlEscape {
     my $txt = shift;
-    $txt =~ s/&/&amp;/g;
+    $txt =~ s/&(?!(amp|lt|gt|quot);)/&amp;/g;
     $txt =~ s/</&lt;/g;
     $txt =~ s/>/&gt;/g;
     $txt =~ s/\"/&quot;/g;
