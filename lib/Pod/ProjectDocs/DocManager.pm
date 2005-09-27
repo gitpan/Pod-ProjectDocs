@@ -25,10 +25,10 @@ sub _init {
     my($self, %args) = @_;
     $args{suffix} = [ $args{suffix} ] unless ref $args{suffix};
     $self->config( $args{config} );
-    $self->desc(   $args{desc}   );
+    $self->desc  ( $args{desc}   );
     $self->suffix( $args{suffix} );
     $self->parser( $args{parser} );
-    $self->docs( [] );
+    $self->docs  ( []            );
     $self->_find_files;
 }
 

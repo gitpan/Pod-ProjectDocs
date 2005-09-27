@@ -12,9 +12,9 @@ __PACKAGE__->data( do{ local $/; <DATA> } );
 sub _init {
     my($self, %args) = @_;
     $self->SUPER::_init(%args);
-    $self->origin(      $args{origin}      );
+    $self->origin     ( $args{origin}      );
     $self->origin_root( $args{origin_root} );
-    $self->suffix(      $args{suffix}      );
+    $self->suffix     ( $args{suffix}      );
     $self->_set_relpath;
 }
 
@@ -89,7 +89,7 @@ __DATA__
   </form>
 </div>
 <div class="path">
-  <a href="[% outroot | relpath %]">[% title | html %]</a> > [% mgr_desc | html %] >
+  <a href="[% outroot _ '/index.html' | relpath %]">[% title | html %]</a> > [% mgr_desc | html %] >
   [% name | html %]
 </div>
 <a href="[% src | relpath %]">Source</a>

@@ -5,7 +5,7 @@ use Pod::ProjectDocs;
 
 Pod::ProjectDocs->new(
     outroot => "$FindBin::Bin/output",
-    libroot => "$FindBin::Bin/sample",
+    libroot => "$FindBin::Bin/sample/lib",
     forcegen => 1,
 )->gen;
 

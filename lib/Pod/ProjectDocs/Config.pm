@@ -30,14 +30,14 @@ sub new {
 
 sub _init {
     my($self, %args) = @_;
-    $self->title(   $args{title}   || $DEFAULT_TITLE   );
-    $self->desc(    $args{desc}    || $DEFAULT_DESC    );
-    $self->charset( $args{charset} || $DEFAULT_CHARSET );
-    $self->verbose( $args{verbose}                     );
-    $self->index(   $args{index}                       );
-    $self->outroot( $args{outroot}                     );
-    $self->libroot( $args{libroot}                     );
-    $self->forcegen( $args{forcegen}                   );
+    $self->title   ( $args{title}   || $DEFAULT_TITLE   );
+    $self->desc    ( $args{desc}    || $DEFAULT_DESC    );
+    $self->charset ( $args{charset} || $DEFAULT_CHARSET );
+    $self->verbose ( $args{verbose}                     );
+    $self->index   ( $args{index}                       );
+    $self->outroot ( $args{outroot}                     );
+    $self->libroot ( $args{libroot}                     );
+    $self->forcegen( $args{forcegen}                    );
 }
 
 1;

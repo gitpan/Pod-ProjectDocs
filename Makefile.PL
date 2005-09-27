@@ -16,5 +16,6 @@ WriteMakefile(
 		Template => 0,
 		Readonly => 0,
         URI::Escape => 0,
+		JSON => 0.991,
 	}, # e.g., Module::Name => 1.1
 );

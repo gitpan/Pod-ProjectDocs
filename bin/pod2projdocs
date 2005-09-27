@@ -10,15 +10,15 @@ use Pod::ProjectDocs;
 my($help, $out, $lib, $title, $desc, $charset, $index, $verbose, $forcegen);
 
 my %opt = (
-	'help|?'		=> \$help,
-	'out|o=s'		=> \$out,
-	'lib|l=s@'		=> \$lib,
-	'title|t=s'		=> \$title,
-	'desc|d=s'		=> \$desc,
-	'charset|c=s'	=> \$charset,
-	'index!'		=> \$index,
-	'verbose|v'		=> \$verbose,
-        'forcegen!'             => \$forcegen,
+    'help|?'      => \$help,
+    'out|o=s'     => \$out,
+    'lib|l=s@'    => \$lib,
+    'title|t=s'   => \$title,
+    'desc|d=s'    => \$desc,
+    'charset|c=s' => \$charset,
+    'index!'      => \$index,
+    'verbose|v'   => \$verbose,
+    'forcegen!'   => \$forcegen,
 );
 
 GetOptions(%opt);
@@ -26,14 +26,14 @@ GetOptions(%opt);
 pod2usage(1) if($help);
 
 my $p = Pod::ProjectDocs->new(
-	outroot	=> $out,
-	libroot	=> $lib,
-	title	=> $title,
-	desc	=> $desc,
-	charset	=> $charset,
-	index	=> $index,
-	verbose	=> $verbose,
-        forcegen => $forcegen,
+    outroot  => $out,
+    libroot  => $lib,
+    title    => $title,
+    desc     => $desc,
+    charset  => $charset,
+    index    => $index,
+    verbose  => $verbose,
+    forcegen => $forcegen,
 );
 $p->gen;
 
@@ -72,7 +72,7 @@ L<Pod::ProjectDocs>
 
 =head1 AUTHOR
 
-Lyo Kato E<lt>E<gt>
+Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,6 +5,7 @@ use warnings;
 use base qw/Class::Accessor::Fast/;
 
 use File::Spec;
+use JSON;
 use Pod::ProjectDocs::DocManager;
 use Pod::ProjectDocs::Config;
 use Pod::ProjectDocs::Parser::PerlPod;
@@ -15,7 +16,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub new {
     my $class = shift;
@@ -119,13 +120,13 @@ sub gen {
 
         my $ite = $manager->doc_iterator();
         while ( my $doc = $ite->next ) {
+            my $html = $manager->parser->gen_html(
+                doc        => $doc,
+                desc       => $manager->desc,
+                components => $self->components,
+            );
             if ( $self->config->forcegen || $doc->is_modified ) {
                 $doc->copy_src();
-                my $html = $manager->parser->gen_html(
-                    doc        => $doc,
-                    desc       => $manager->desc,
-                    components => $self->components,
-                );
                 $doc->publish($html);
             }
         }
@@ -134,9 +135,32 @@ sub gen {
     my $index_page = Pod::ProjectDocs::IndexPage->new(
         config     => $self->config,
         components => $self->components,
-        managers   => $self->managers,
+        json       => $self->get_managers_json,
     );
     $index_page->publish();
+}
+
+sub get_managers_json {
+    my $self    = shift;
+    my $js      = JSON->new;
+    my $records = [];
+    foreach my $manager ( @{ $self->managers } ) {
+        my $record = {
+            desc    => $manager->desc,
+            records => [],
+        };
+        foreach my $doc ( @{ $manager->docs } ) {
+            push @{ $record->{records} }, {
+                path  => $doc->relpath,
+                name  => $doc->name,
+                title => $doc->title,
+            };
+        }
+        if ( scalar( @{ $record->{records} } ) > 0 ) {
+            push @$records, $record;
+        }
+    }
+    return $js->objToJson($records);
 }
 
 sub _croak {
@@ -250,7 +274,7 @@ L<Pod::Parser>
 
 =head1 AUTHOR
 
-Lyo Kato E<lt>kato@lost-season.jpE<gt>
+Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
