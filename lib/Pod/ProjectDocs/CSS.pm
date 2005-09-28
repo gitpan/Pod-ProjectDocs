@@ -395,3 +395,6 @@ table.dlsip     {
   border-top: none;
 }
 
+.search_highlight {
+	color: #ff6600;
+}

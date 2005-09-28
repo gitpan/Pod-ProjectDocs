@@ -56,25 +56,30 @@ function render(pattern) {
 }
 function get_rows_html (manager, pattern) {
     var html   = '';
-    var regexp = new RegExp(pattern, "i");
+    var regexp = new RegExp( "(" + pattern + ")", "gi");
     var seq    = 0;
     for (var i = 0; i < manager.records.length; i++) {
         var record = manager.records[i];
         if ( record.name.match(regexp) ) {
-            html += get_record_html(manager.records[i], seq);
+            var module_name = manager.records[i].name;
+            if(pattern != '' ) {
+                var replace_text = "<span class='search_highlight'>$1</span>";
+                module_name = module_name.replace(regexp, replace_text);
+            }
+            html += get_record_html(record, module_name, seq);
             seq++;
         }
     }
     return html;
 }
-function get_record_html (record, i) {
+function get_record_html (record, name, i) {
     var row_class  = ( i % 2 == 0 ) ? 'r' : 's';
     var row_html   = "<tr class='"
                    + row_class
                    + "'><td nowrap='nowrap'><a href='"
                    + record.path
                    + "'>"
-                   + record.name + "</a></td><td width='99%'><small>"
+                   + name + "</a></td><td width='99%'><small>"
                    + record.title
                    + "</small></td></tr>";
     return row_html;

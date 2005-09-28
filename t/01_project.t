@@ -10,7 +10,7 @@ Pod::ProjectDocs->new(
 )->gen;
 
 # using XML::XPath might be better
-open my $fh, "$FindBin::Bin/output/lib/Sample/Project.pm.html";
+open my $fh, "$FindBin::Bin/output/Sample/Project.pm.html";
 my $html = join '', <$fh>;
 
 like $html, qr!See <a href="#SYNOPSIS">SYNOPSIS</a> for its usage!;
