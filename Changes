@@ -1,7 +1,10 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.22 Tue Dec 11 02:00:00 2005
+    - now generated files are strict xhtml.
+
 0.21 Tue Sep 27 13:00:00 2005
-    - highlight matched word
+    - added function highlighting matched word
 
 0.20 Tue Sep 27 12:00:00 2005
     - fixed test script

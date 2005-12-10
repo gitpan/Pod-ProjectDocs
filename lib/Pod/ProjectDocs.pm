@@ -16,7 +16,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 sub new {
     my $class = shift;
@@ -64,7 +64,7 @@ sub _setup_managers {
     $self->reset_managers();
     $self->add_manager('Perl Manuals', 'pod', Pod::ProjectDocs::Parser::PerlPod->new);
     $self->add_manager('Perl Modules', 'pm',  Pod::ProjectDocs::Parser::PerlPod->new);
-	$self->add_manager('Trigger Scripts', ['cgi', 'pl'], Pod::ProjectDocs::Parser::PerlPod->new);
+    $self->add_manager('Trigger Scripts', ['cgi', 'pl'], Pod::ProjectDocs::Parser::PerlPod->new);
     $self->add_manager('JavaScript Libraries', 'js', Pod::ProjectDocs::Parser::JavaScriptPod->new);
 }
 
@@ -245,10 +245,9 @@ This is used in meta tag. default 'UTF-8'
 whether you want to create index on each pod pages or not.
 set 1 or 0.
 
-=item verbose
+=item lang
 
-whether you want to show messages on your shell or not.
-set 1 or 0.
+what language is set for xml:lang
 
 =item forcegen
 

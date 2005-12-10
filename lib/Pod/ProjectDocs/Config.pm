@@ -15,11 +15,13 @@ __PACKAGE__->mk_accessors(qw/
     outroot
     libroot
     forcegen
+    lang
 /);
 
 Readonly my $DEFAULT_TITLE   => qq/MyProject's Libraries/;
 Readonly my $DEFAULT_DESC    => qq/manuals and libraries/;
 Readonly my $DEFAULT_CHARSET => qq/UTF-8/;
+Readonly my $DEFAULT_LANG    => qq/en/;
 
 sub new {
     my $class = shift;
@@ -33,6 +35,7 @@ sub _init {
     $self->title   ( $args{title}   || $DEFAULT_TITLE   );
     $self->desc    ( $args{desc}    || $DEFAULT_DESC    );
     $self->charset ( $args{charset} || $DEFAULT_CHARSET );
+    $self->lang    ( $args{lang}    || $DEFAULT_LANG    );
     $self->verbose ( $args{verbose}                     );
     $self->index   ( $args{index}                       );
     $self->outroot ( $args{outroot}                     );

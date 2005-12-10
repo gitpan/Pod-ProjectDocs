@@ -12,7 +12,7 @@ __PACKAGE__->mk_accessors(qw/json components/);
 sub _init {
     my($self, %args) = @_;
     $self->SUPER::_init(%args);
-	$self->json      ( $args{json}       );
+    $self->json      ( $args{json}       );
     $self->components( $args{components} );
 }
 
@@ -21,7 +21,8 @@ sub _get_data {
     my $params = {
         title    => $self->config->title,
         desc     => $self->config->desc,
-		json     => $self->json,
+        lang     => $self->config->lang,
+        json     => $self->json,
         css      => $self->components->{css}->tag($self),
         charset  => $self->config->charset || 'UTF-8',
     };
@@ -32,12 +33,16 @@ sub _get_data {
 
 1;
 __DATA__
-<html>
+<?xml version="1.0" encoding="[% charset %]"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[% lang %]">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=[% charset %]" />
 <title>[% title | html %]</title>
 [% css %]
-<script language="JavaScript">
+<script type="text/javascript">
+//<![CDATA[
 var managers = [% json %];
 function render(pattern) {
     var html = '';
@@ -84,7 +89,7 @@ function get_record_html (record, name, i) {
                    + "</small></td></tr>";
     return row_html;
 }
-//-->
+//]]>
 </script>
 </head>
 <body onload="render('')">
@@ -93,7 +98,7 @@ function get_record_html (record, name, i) {
   <table>
     <tr>
       <td class="label">Description</td>
-      <td class="cell">[% desc | return2br %]</td>
+      <td class="cell">[% desc | html_line_break %]</td>
     </tr>
   </table>
 </div>

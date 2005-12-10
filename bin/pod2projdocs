@@ -7,7 +7,7 @@ use Getopt::Long;
 use Pod::Usage;
 use Pod::ProjectDocs;
 
-my($help, $out, $lib, $title, $desc, $charset, $index, $verbose, $forcegen);
+my($help, $out, $lib, $title, $lang, $desc, $charset, $index, $verbose, $forcegen);
 
 my %opt = (
     'help|?'      => \$help,
@@ -19,6 +19,7 @@ my %opt = (
     'index!'      => \$index,
     'verbose|v'   => \$verbose,
     'forcegen!'   => \$forcegen,
+    'lang=s'      => \$lang,
 );
 
 GetOptions(%opt);
@@ -34,6 +35,7 @@ my $p = Pod::ProjectDocs->new(
     index    => $index,
     verbose  => $verbose,
     forcegen => $forcegen,
+    lang     => $lang,
 );
 $p->gen;
 
@@ -53,7 +55,7 @@ pod2projdocs [options]
     -desc        your project's description
     -charset     this is used in meta tag in html. default 'UTF-8'
     -noindex     don't create index on each pod pages.
-    -verbose     show messages.
+    -lang        set this language as xml:lang. default 'en'
 
  you can set each options with their first alphabet.
  for example, you can write -o instead of -out.

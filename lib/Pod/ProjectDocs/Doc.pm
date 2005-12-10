@@ -78,20 +78,20 @@ sub is_modified {
 1;
 __DATA__
 <div class="box">
-  <form name="form1">
   <h1 class="t1">[% title | html %]</h1>
   <table>
     <tr>
       <td class="label">Description</td>
-      <td class="cell">[% desc | html | return2br %]</td>
+      <td class="cell">[% desc | html | html_line_break %]</td>
     </tr>
   </table>
-  </form>
 </div>
 <div class="path">
-  <a href="[% outroot _ '/index.html' | relpath %]">[% title | html %]</a> > [% mgr_desc | html %] >
+  <a href="[% outroot _ '/index.html' | relpath %]">[% title | html %]</a> &gt; [% mgr_desc | html %] &gt;
   [% name | html %]
 </div>
+<div>
 <a href="[% src | relpath %]">Source</a>
+</div>
 
 
