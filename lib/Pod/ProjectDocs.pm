@@ -16,7 +16,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.22';
+our $VERSION = '0.26';
 
 sub new {
     my $class = shift;
@@ -43,6 +43,9 @@ sub _init {
 
     # check mtime by default, but can be overridden
     $args{forcegen} ||= 0;
+
+    $args{except} ||= [];
+    $args{except} = [ $args{except} ] unless ref $args{except};
 
     $self->config( Pod::ProjectDocs::Config->new(%args) );
 
@@ -252,6 +255,20 @@ what language is set for xml:lang
 =item forcegen
 
 whether you want to generate HTML document even if source files are not updated. default is 0.
+
+=item except
+
+if you set this parameter as regex, the file matches this regex won't be checked.
+
+  Pod::ProjectDocs->new(
+    except => qr/^specific_dir\//,
+    ...other parameters
+  );
+
+  Pod::ProjectDocs->new(
+    except => [qr/^specific_dir1\//, qr/^specific_dir2\//],
+    ...other parameters
+  );
 
 =back
 

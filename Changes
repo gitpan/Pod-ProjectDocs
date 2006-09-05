@@ -1,5 +1,9 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.26 Tue Jul 11 02:00:00 2006
+    - added 'except' parameter,
+      Thanks to Nadim.
+
 0.22 Tue Dec 11 02:00:00 2005
     - now generated files are strict xhtml.
 

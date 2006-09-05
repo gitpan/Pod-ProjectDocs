@@ -16,6 +16,7 @@ __PACKAGE__->mk_accessors(qw/
     libroot
     forcegen
     lang
+    except
 /);
 
 Readonly my $DEFAULT_TITLE   => qq/MyProject's Libraries/;
@@ -41,6 +42,7 @@ sub _init {
     $self->outroot ( $args{outroot}                     );
     $self->libroot ( $args{libroot}                     );
     $self->forcegen( $args{forcegen}                    );
+    $self->except  ( $args{except}                      );
 }
 
 1;
