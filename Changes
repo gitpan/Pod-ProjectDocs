@@ -1,5 +1,11 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.30 Tue Jan 09 12:00:00 2007
+    - applyed a great patch from Ankur Gupta.
+      Now you can see syntax highlighten source code below the document for each methods.
+      When the parser finds format like "=head2 method_name", it appends source code block
+      on HTML. Click the anchor "[Source]", and it toggles the source code block.
+
 0.26 Tue Jul 11 02:00:00 2006
     - added 'except' parameter,
       Thanks to Nadim.
