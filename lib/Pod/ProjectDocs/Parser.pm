@@ -7,7 +7,18 @@ use URI::Escape;
 use File::Spec;
 use File::Basename;
 use Pod::ProjectDocs::Template;
-use Syntax::Highlight::Universal;
+
+BEGIN {
+    our $HIGHLIGHTER;
+    eval {
+        require Syntax::Highlight::Universal;
+        $HIGHLIGHTER = Syntax::Highlight::Universal->new;
+    };
+    *highlighten = $HIGHLIGHTER ? sub {
+        my ($self, $type, $str) = @_;
+        $HIGHLIGHTER->highlight($type, $str);
+    } : sub { return $_[2] };
+}
 
 # most of code is borrowed from Pod::Xhtml
 __PACKAGE__->mk_accessors(qw/components local_modules current_files_output_path/);
@@ -620,7 +631,6 @@ sub gen_html {
     my $doc        = $args{doc};
     my $components = $args{components};
     my $mgr_desc   = $args{desc};
-    my $highlighter = Syntax::Highlight::Universal->new;
     open(FILE, $doc->origin) or warn $!;
     while(<FILE>) {
         next unless /^\s*sub\s+(\w+)/;
@@ -630,7 +640,7 @@ sub gen_html {
             $sub .= $_;
             last if /^}/;
         }
-        my $result = $highlighter->highlight("perl", $sub);
+        my $result = $self->highlighten("perl", $sub);
         $self->{_source_code}{$method} = $result;
     }
     close(FILE);

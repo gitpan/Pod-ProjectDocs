@@ -1,22 +1,27 @@
-use ExtUtils::MakeMaker;
-WriteMakefile(
-    NAME              => 'Pod::ProjectDocs',
-    VERSION_FROM      => 'lib/Pod/ProjectDocs.pm', # finds $VERSION
-	EXE_FILES         => ['bin/pod2projdocs'],
-    PREREQ_PM         => {
-		Pod::Parser => 1.32,
-		Pod::ParseUtils => 0,
-		Class::Accessor::Fast => 0,
-		Class::Data::Inheritable => 0,
-		File::Spec => 0,
-		File::Basename => 0,
-		File::Find => 0,
-        File::Copy => 0,
-		MIME::Base64 => 0,
-		Template => 0,
-		Readonly => 0,
-        URI::Escape => 0,
-		JSON => 0.991,
-    Syntax::Highlight::Universal => 0,
-	}, # e.g., Module::Name => 1.1
+use inc::Module::Install;
+
+name           'Pod-ProjectDocs';
+all_from       'lib/Pod/ProjectDocs.pm';
+install_script 'bin/pod2projdocs';
+requires 'Pod::Parser'              => 1.32;
+requires 'Pod::ParseUtils'          => 0;
+requires 'Class::Accessor::Fast'    => 0;
+requires 'Class::Data::Inheritable' => 0;
+requires 'File::Spec'               => 0;
+requires 'File::Basename'           => 0;
+requires 'File::Find'               => 0;
+requires 'File::Copy'               => 0;
+requires 'MIME::Base64'             => 0;
+requires 'Template'                 => 0;
+requires 'Readonly'                 => 0;
+requires 'URI::Escape'              => 0;
+requires 'JSON'                     => 0.991;
+features(
+  'Syntax Highlighten' => [
+    -default => 1,
+    recommends('Syntax::Highlight::Universal'),
+  ]
 );
+auto_install;
+WriteAll;
+

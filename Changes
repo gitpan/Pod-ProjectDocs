@@ -1,5 +1,9 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.31 Mon Jan 29 12:00:00 2007
+    - Changed to use Module::Install for instllation,
+      and made dependency on Syntax::Highlight::Universal optional.
+
 0.30 Tue Jan 09 12:00:00 2007
     - applyed a great patch from Ankur Gupta.
       Now you can see syntax highlighten source code below the document for each methods.
