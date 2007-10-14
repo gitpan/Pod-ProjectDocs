@@ -12,7 +12,7 @@ __PACKAGE__->mk_accessors(qw/json components/);
 sub _init {
     my($self, %args) = @_;
     $self->SUPER::_init(%args);
-    $self->json      ( $args{json}       );
+    $self->json( $args{json} );
     $self->components( $args{components} );
 }
 

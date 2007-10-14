@@ -25,7 +25,7 @@ my %opt = (
 
 GetOptions(%opt);
 
-pod2usage(1) if($help);
+pod2usage(1) if($help||@ARGV==0);
 
 my $p = Pod::ProjectDocs->new(
     outroot  => $out,
@@ -57,6 +57,7 @@ pod2projdocs [options]
     -desc        your project's description
     -charset     this is used in meta tag in html. default 'UTF-8'
     -noindex     don't create index on each pod pages.
+    -forcegen    generate documents each time ignoring last modified timestamp
     -lang        set this language as xml:lang. default 'en'
     -except      set regex, and the file matches this regex won't be checked
 

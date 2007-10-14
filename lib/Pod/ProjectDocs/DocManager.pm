@@ -6,15 +6,13 @@ use base qw/Class::Accessor::Fast/;
 use File::Find;
 use Pod::ProjectDocs::Doc;
 
-__PACKAGE__->mk_accessors(
-    qw/
-      config
-      desc
-      suffix
-      parser
-      docs
-      /
-);
+__PACKAGE__->mk_accessors(qw/
+    config
+    desc
+    suffix
+    parser
+    docs
+/);
 
 sub new {
     my $class = shift;

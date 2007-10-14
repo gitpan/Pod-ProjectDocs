@@ -12,9 +12,9 @@ __PACKAGE__->data( do{ local $/; <DATA> } );
 sub _init {
     my($self, %args) = @_;
     $self->SUPER::_init(%args);
-    $self->origin     ( $args{origin}      );
+    $self->origin( $args{origin} );
     $self->origin_root( $args{origin_root} );
-    $self->suffix     ( $args{suffix}      );
+    $self->suffix( $args{suffix} );
     $self->_set_relpath;
 }
 
