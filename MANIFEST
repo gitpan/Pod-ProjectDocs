@@ -30,5 +30,7 @@ META.yml			Module meta-data (added by MakeMaker)
 README
 t/00_compile.t
 t/01_project.t
+t/02_module.t
 t/sample/lib/Sample/Module.pm
 t/sample/lib/Sample/Project.pm
+t/sample/lib2/Module.pm

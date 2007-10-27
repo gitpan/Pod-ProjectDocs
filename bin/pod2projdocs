@@ -7,7 +7,8 @@ use Getopt::Long;
 use Pod::Usage;
 use Pod::ProjectDocs;
 
-my($help, $out, $lib, $title, $lang, $desc, $charset, $index, $verbose, $forcegen, $except);
+my($out, $lib, $title, $lang, $desc, $charset, $index, $verbose, $forcegen, $except);
+my $help = @ARGV == 0;
 
 my %opt = (
     'help|?'      => \$help,
@@ -25,7 +26,7 @@ my %opt = (
 
 GetOptions(%opt);
 
-pod2usage(1) if($help||@ARGV==0);
+pod2usage(1) if $help;
 
 my $p = Pod::ProjectDocs->new(
     outroot  => $out,

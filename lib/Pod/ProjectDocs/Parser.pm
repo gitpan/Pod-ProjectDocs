@@ -8,6 +8,9 @@ use File::Spec;
 use File::Basename;
 use Pod::ProjectDocs::Template;
 
+
+our $METHOD_REGEXP ||= qr/^(\w+).*/;
+
 BEGIN {
     our $HIGHLIGHTER;
     eval {
@@ -217,7 +220,7 @@ sub _addCommand {
             my $head_level = $1;
             $anchor = $self->_addSection( "head${head_level}", $paragraph );
             $self->{buffer} .= qq(<h${head_level} id="$anchor">$paragraph</h${head_level}>\n\n);
-            (my $method = $paragraph) =~ s#^(\w+).*#$1#;
+            (my $method = $paragraph) =~ s#$METHOD_REGEXP#$1#;
             if ( exists $self->{_source_code}{$method} ) {
                 $self->{buffer} .= qq{<p><a href="#" onclick="toggleCode('method_$method');return false;">[Source]</a></p>
                                         <div class="method-source-code" id="method_$method">

@@ -1,5 +1,10 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.34 Sat Oct 27 21:56:00 2007
+    - Fixed pod2projdocs bug.
+      Added METHOD_REGEXP, now you can control pattern that the parser consider as method.
+      Thanks to Ktat.
+
 0.33 Mon Oct 15 01:55:00 2007
     - Fixed document of pod2projdocs - added description for forcegen option.
       Now it shows it's usage when excused without any option.
