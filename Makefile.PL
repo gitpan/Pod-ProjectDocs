@@ -15,7 +15,7 @@ requires 'MIME::Base64'             => 0;
 requires 'Template'                 => 0;
 requires 'Readonly'                 => 0;
 requires 'URI::Escape'              => 0;
-requires 'JSON'                     => 0.991;
+requires 'JSON'                     => 2.04;
 features(
   'Syntax Highlighten' => [
     -default => 1,
