@@ -1,5 +1,10 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.36 Wed May 14 10:20:00 2008
+    - $json->objToJson => $json->encode
+      objToJson prints deprecated warnings.
+      Thanks to tokuhirom.
+
 0.35 Fri Jan 18 18:10:00 2008
     - removed $json->autoconv(0) because JSON doesn't have autoconv method from version 2.
 		  RT#32408, 32409

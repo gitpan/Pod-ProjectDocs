@@ -16,7 +16,7 @@ use Pod::ProjectDocs::IndexPage;
 
 __PACKAGE__->mk_accessors(qw/managers components config/);
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 sub new {
     my $class = shift;
@@ -163,7 +163,7 @@ sub get_managers_json {
             push @$records, $record;
         }
     }
-    return $js->objToJson($records);
+    return $js->encode($records);
 }
 
 sub _croak {

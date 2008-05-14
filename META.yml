@@ -24,4 +24,4 @@ requires:
   Readonly: 0
   Template: 0
   URI::Escape: 0
-version: 0.35
+version: 0.36
