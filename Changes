@@ -1,5 +1,9 @@
 Revision history for Perl extension Pod::ProjectDocs.
 
+0.38 Thr Mar 11 01:20:00 2010
+    - fixed pod2projdocs typo
+      Thanks to Tokuhiro Matsuno and Naoki Tomita
+
 0.36 Wed May 14 10:20:00 2008
     - $json->objToJson => $json->encode
       objToJson prints deprecated warnings.

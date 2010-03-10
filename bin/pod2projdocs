@@ -14,7 +14,7 @@ my %opt = (
     'help|?'      => \$help,
     'out|o=s'     => \$out,
     'lib|l=s@'    => \$lib,
-    'except|=s@'  => \$except,
+    'except|e=s@' => \$except,
     'title|t=s'   => \$title,
     'desc|d=s'    => \$desc,
     'charset|c=s' => \$charset,
